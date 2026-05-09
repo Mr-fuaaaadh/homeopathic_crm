@@ -114,7 +114,9 @@ Ensure you have the following installed on your local machine:
 
 ## 📡 API Endpoints Reference
 
-Here is a quick overview of the currently running REST API endpoints provided by the backend:
+The full list of endpoints and their configurations can be found in [config/urls.py](config/urls.py).
+
+Here is a quick overview of the currently running REST API endpoints:
 
 ### Authentication (`/api/v1/auth/`)
 | Method | Endpoint | Description |
