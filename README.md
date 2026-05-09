@@ -64,7 +64,7 @@ Ensure you have the following installed on your local machine:
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Mr-fuaaaadh/homeopathic_crm.git
    cd homeopathy_cms
    ```
 
@@ -102,96 +102,51 @@ Ensure you have the following installed on your local machine:
    ```bash
    python manage.py runserver
    ```
-   *Note: To test WebSockets locally, you might need to run via Daphne:*
-   ```bash
-   daphne -p 8000 config.asgi:application
-   ```
 
 8. **Start Celery Worker (in a separate terminal):**
    ```bash
    celery -A config worker -l info
    ```
 
-## 📡 API Endpoints Reference
+## 📡 API Endpoints Reference (Active)
 
 The full list of endpoints and their configurations can be found in [config/urls.py](config/urls.py).
 
-Here is a quick overview of the currently running REST API endpoints:
-
 ### Authentication (`/api/v1/auth/`)
+Source: [apps/accounts/urls.py](apps/accounts/urls.py)
+
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | `POST` | `/register/` | Register new user |
 | `POST` | `/login/` | Obtain JWT tokens |
 | `POST` | `/logout/` | Blacklist refresh token |
 | `POST` | `/token/refresh/` | Refresh access token |
-| `POST` | `/token/verify/` | Verify token validity |
+| `POST` | `/token/verify/` | Verify token validity (defined in root urls) |
+| `GET` | `/me/` | Current user profile |
 | `POST` | `/password/change/` | Change password |
-| `POST` | `/password/reset/` | Request password reset |
-| `POST` | `/password/reset/confirm/` | Confirm password reset |
-| `GET/PATCH` | `/me/` | Current user profile |
+| `GET` | `/sessions/` | List active sessions |
 
 ### Clinics (`/api/v1/clinics/`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET/POST` | `/` | List/Create clinics (SuperAdmin) |
-| `GET/PUT/DELETE`| `/{id}/` | Clinic detail/update/soft-delete |
-| `GET` | `/{id}/stats/` | Clinic statistics |
-| `POST` | `/{id}/subscription/`| Update subscription |
+Source: [apps/clinics/urls.py](apps/clinics/urls.py)
 
-### Patients (`/api/v1/patients/`)
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET/POST` | `/` | List/Register new patient |
-| `GET/PUT/DELETE`| `/{id}/` | Patient detail/update/soft-delete |
-| `GET` | `/{id}/history/` | Visit history timeline |
-| `GET/POST` | `/{id}/attachments/` | List/Upload attachments |
+| `GET` | `/` | List clinics |
+| `POST` | `/` | Create clinic (SuperAdmin only) |
+| `GET` | `/{id}/` | Get clinic detail |
+| `PUT/PATCH` | `/{id}/` | Update clinic |
+| `DELETE` | `/{id}/` | Soft-delete clinic |
+| `GET` | `/{id}/stats/` | Clinic usage statistics |
+| `POST` | `/{id}/subscription/` | Update clinic subscription |
 
-### Appointments (`/api/v1/appointments/`)
+### System & Admin
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET/POST` | `/` | List/Book appointment |
-| `GET/PUT` | `/{id}/` | Appointment detail/update |
-| `POST` | `/{id}/reschedule/` | Reschedule appointment |
-| `POST` | `/{id}/cancel/` | Cancel appointment |
-| `POST` | `/{id}/complete/` | Mark complete |
-| `GET` | `/queue/` | Today's queue |
-| `POST` | `/queue/next/` | Call next patient |
-| `GET` | `/slots/` | Available slots by doctor/date |
+| `GET` | `/admin/` | Django Admin Dashboard |
+| `GET` | `/silk/` | Silk Profiling (Development only) |
 
-### Prescriptions (`/api/v1/prescriptions/`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET/POST` | `/` | List/Create prescriptions |
-| `GET/PUT` | `/{id}/` | Prescription detail/update |
-| `GET` | `/{id}/pdf/` | Download PDF |
-| `POST/DELETE` | `/{id}/remedies/` | Add/Remove remedy |
-
-### Staff (`/api/v1/staff/`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET/POST` | `/` | List/Add staff |
-| `GET/PUT/DELETE`| `/{id}/` | Staff detail/update/deactivate |
-| `GET` | `/{id}/activity/` | Activity log for staff |
-| `POST` | `/{id}/roles/` | Assign roles |
-| `GET` | `/doctors/` | Doctors list (for scheduling) |
-
-### Billing (`/api/v1/billing/`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET/POST` | `/invoices/` | List/Create invoice |
-| `GET` | `/invoices/{id}/` | Invoice detail |
-| `POST` | `/invoices/{id}/pay/` | Record payment |
-| `GET` | `/invoices/{id}/pdf/` | Download invoice PDF |
-| `GET` | `/payments/` | Payment history |
-
-### Notifications & Logs (`/api/v1/`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/notifications/` | User notifications |
-| `POST` | `/notifications/send/` | Send manual notification |
-| `GET` | `/activity-logs/` | List logs |
-| `GET` | `/activity-logs/export/` | Export as CSV |
+> [!NOTE]
+> Modules for Patients, Appointments, Prescriptions, Staff, Billing, Notifications, and Activity Logs are currently initialized with empty routes and are under active development.
 
 ## 🧪 Testing
 
