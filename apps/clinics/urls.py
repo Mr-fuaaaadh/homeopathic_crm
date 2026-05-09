@@ -1,8 +1,12 @@
-from django.urls import path
-from django.urls import include
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from apps.clinics.views import ClinicViewSet
 
 app_name = "clinics"
 
+router = DefaultRouter()
+router.register(r"", ClinicViewSet, basename="clinic")
+
 urlpatterns = [
-    path("", include("apps.clinics.views.ClinicViewSet", basename="clinic")),
+    path("", include(router.urls)),
 ]
