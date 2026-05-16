@@ -90,39 +90,85 @@ The system enforces strict access control based on user roles. A user can have a
 All endpoints (except Auth and Clinic creation) require a `clinic_id`. This can be provided via the `X-Clinic-ID` header or is automatically extracted from the JWT token claims.
 
 ### 🔑 Authentication (`/api/v1/auth/`)
-- `POST /login/`: Obtain access and refresh tokens. Returns user role and clinic context.
-- `GET /me/`: Get current user profile and assigned clinics.
-- `POST /register/`: Register a new account.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/register/` | Register new user account |
+| `POST` | `/login/` | Obtain JWT tokens (Access/Refresh) |
+| `POST` | `/logout/` | Blacklist refresh token |
+| `POST` | `/token/refresh/` | Get new access token |
+| `POST` | `/token/verify/` | Verify token validity |
+| `POST` | `/password/change/` | Update password (Authenticated) |
+| `GET` | `/me/` | Get current profile & clinics |
+| `PATCH` | `/me/` | Update own profile |
 
 ### 🏥 Clinics (`/api/v1/clinics/`)
-- `GET /`: List clinics the user has access to.
-- `POST /`: Create a new clinic (SuperAdmin only).
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/` | List accessible clinics |
+| `POST` | `/` | Create new clinic (SuperAdmin) |
+| `GET` | `/{id}/` | Clinic configuration & details |
+| `PUT/PATCH` | `/{id}/` | Update clinic settings |
+| `DELETE` | `/{id}/` | Deactivate/Delete clinic |
+| `GET` | `/{id}/stats/` | Usage & billing statistics |
 
 ### 👥 Patients (`/api/v1/patients/`)
-- `GET /`: Search and filter patients.
-- `POST /`: Register a new patient.
-- `GET /{id}/history/`: View patient medical history timeline.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/` | List patients (Filter/Search) |
+| `POST` | `/` | Register new patient |
+| `GET` | `/{id}/` | Detailed patient record |
+| `PUT/PATCH` | `/{id}/` | Update demographics |
+| `DELETE` | `/{id}/` | Archive patient |
+| `GET` | `/{id}/history/` | Full medical history timeline |
+| `POST` | `/{id}/attachments/` | Upload medical reports/docs |
 
 ### 📅 Appointments (`/api/v1/appointments/`)
-- `GET /queue/`: View today's live patient queue.
-- `POST /queue/next/`: (Receptionist/Doctor) Call the next patient in line.
-- `GET /slots/`: Check available time slots for a specific doctor/date.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/` | List all appointments |
+| `POST` | `/` | Book a new slot |
+| `GET` | `/queue/` | Live today's patient queue |
+| `POST` | `/queue/next/` | Advance the queue (Call next) |
+| `GET` | `/slots/` | Query availability by doctor/date |
+| `POST` | `/{id}/cancel/` | Cancel appointment |
+| `POST` | `/{id}/complete/`| Mark as finished |
 
 ### 📜 Prescriptions (`/api/v1/prescriptions/`)
-- `POST /`: Create a new prescription.
-- `GET /{id}/pdf/`: Generate and download the PDF version of the prescription.
-- `GET /remedies/`: Access the global and clinic-specific homeopathic remedy database.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/` | List clinical records |
+| `POST` | `/` | Create new prescription |
+| `GET` | `/{id}/` | Prescription detail |
+| `GET` | `/{id}/pdf/` | Generate & Download PDF |
+| `POST` | `/{id}/remedies/` | Add homeopathic remedy line |
+| `GET` | `/remedies/` | Remedy Materia Medica database |
 
 ### 💳 Billing (`/api/v1/billing/`)
-- `GET /invoices/`: View clinic invoices.
-- `POST /invoices/{id}/pay/`: Record a full or partial payment.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/invoices/` | List all clinic invoices |
+| `POST` | `/invoices/` | Generate new invoice |
+| `GET` | `/invoices/{id}/` | Invoice detail & breakdown |
+| `POST` | `/invoices/{id}/pay/`| Record payment (Full/Partial) |
+| `GET` | `/payments/` | Global payment history |
+| `GET` | `/subscriptions/` | Available SaaS plans |
 
 ### 👨‍⚕️ Staff (`/api/v1/staff/`)
-- `POST /invite/`: Invite a new doctor or receptionist to the clinic.
-- `PATCH /{id}/update-role/`: Change a staff member's role or deactivate them.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/` | List clinic staff members |
+| `POST` | `/invite/` | Invite doctor/receptionist |
+| `PATCH` | `/{id}/update-role/`| Change permissions or status |
+| `GET` | `/doctors/` | List available clinicians |
 
-### 🛡️ Activity Logs (`/api/v1/activity-logs/`)
-- `GET /`: View audit logs (Clinic Admin only). Tracks WHO did WHAT to WHICH resource and WHEN.
+### 🛡️ Activity Logs & Notifications
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/activity-logs/` | Immutable audit trails (Admin only) |
+| `GET` | `/notifications/` | Unread system notifications |
+| `POST` | `/notifications/read-all/`| Clear all notifications |
+| `GET` | `/notifications/logs/`| History of sent SMS/Emails |
+
 
 ## 🧪 Testing for Testers
 
