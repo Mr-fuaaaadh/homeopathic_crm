@@ -109,35 +109,30 @@ if settings.DEBUG:
 #   GET    /api/v1/prescriptions/{id}/pdf/         Download PDF
 #   POST   /api/v1/prescriptions/{id}/remedies/    Add remedy
 #   DELETE /api/v1/prescriptions/{id}/remedies/{rid}/ Remove remedy
+#   GET    /api/v1/prescriptions/remedies/         Master remedy list
 #
 # STAFF
 #   GET    /api/v1/staff/                          List staff
-#   POST   /api/v1/staff/                          Add staff member
+#   POST   /api/v1/staff/invite/                   Invite new staff member
 #   GET    /api/v1/staff/{id}/                     Staff detail
-#   PUT    /api/v1/staff/{id}/                     Update staff
-#   DELETE /api/v1/staff/{id}/                     Deactivate staff
-#   GET    /api/v1/staff/{id}/activity/            Activity log for staff
-#   POST   /api/v1/staff/{id}/roles/               Assign roles
-#   GET    /api/v1/staff/doctors/                  Doctors list (for scheduling)
+#   PATCH  /api/v1/staff/{id}/update-role/         Update staff role/status
+#   GET    /api/v1/staff/doctors/                  List all doctors
 #
 # BILLING
 #   GET    /api/v1/billing/invoices/               List invoices
 #   POST   /api/v1/billing/invoices/               Create invoice
 #   GET    /api/v1/billing/invoices/{id}/          Invoice detail
 #   POST   /api/v1/billing/invoices/{id}/pay/      Record payment
-#   GET    /api/v1/billing/invoices/{id}/pdf/      Download invoice PDF
 #   GET    /api/v1/billing/payments/               Payment history
-#   GET    /api/v1/billing/subscriptions/          Subscription plans
-#   POST   /api/v1/billing/subscriptions/          Subscribe clinic
+#   GET    /api/v1/billing/subscriptions/          Available plans
+#   GET    /api/v1/billing/subscriptions/my_subscription/ Current subscription status
 #
 # NOTIFICATIONS
 #   GET    /api/v1/notifications/                  User notifications
-#   POST   /api/v1/notifications/send/             Send manual notification
-#   POST   /api/v1/notifications/{id}/read/        Mark as read
 #   POST   /api/v1/notifications/read-all/         Mark all as read
-#   GET    /api/v1/notifications/templates/        List templates
-#   POST   /api/v1/notifications/templates/        Create template
+#   POST   /api/v1/notifications/{id}/read/        Mark specific as read
+#   GET    /api/v1/notifications/templates/        Message templates
+#   GET    /api/v1/notifications/logs/             Notification logs
 #
 # ACTIVITY LOGS
-#   GET    /api/v1/activity-logs/                  List logs (filter by user/action)
-#   GET    /api/v1/activity-logs/export/           Export as CSV
+#   GET    /api/v1/activity-logs/                  List audit logs (Clinic Admin only)

@@ -8,6 +8,8 @@ django-filter==24.2
 # ─── Database ─────────────────────────────────────────────────────────────────
 psycopg2-binary==2.9.9
 django-pgcrypto==3.1.0
+dj-database-url==2.1.0
+whitenoise==6.6.0
 
 # ─── Redis & Caching ──────────────────────────────────────────────────────────
 redis==5.0.4

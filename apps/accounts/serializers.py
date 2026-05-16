@@ -175,6 +175,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
             for p in profiles
         ]
 
+class UserListSerializer(serializers.ModelSerializer):
+    full_name = serializers.ReadOnlyField()
+
+    class Meta:
+        model = User
+        fields = ["id", "email", "first_name", "last_name", "full_name", "role", "avatar", "is_active"]
+
+
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)

@@ -4,167 +4,126 @@ A comprehensive, robust, and scalable multi-tenant REST API backend designed spe
 
 ## 🌟 Key Features
 
-* **Multi-Tenant Architecture:** Securely manage multiple clinics from a single backend instance using the `clinics` app.
-* **Role-Based Access Control (RBAC):** Granular permissions for Super Admins, Clinic Admins, Doctors, and Receptionists via the `accounts` and `staff` modules.
-* **Patient Management:** Comprehensive electronic health records (EHR), tracking, and activity logging.
-* **Smart Appointments:** Queue management, scheduling, and conflict resolution using the `appointments` module.
-* **Digital Prescriptions:** Generate PDF prescriptions seamlessly using `weasyprint` and `reportlab`.
-* **Billing & Invoicing:** Integrated billing system with automated invoice generation.
-* **Real-time Capabilities:** WebSockets support via `Django Channels` and `Daphne` for real-time queue updates and notifications.
-* **Asynchronous Tasks:** Celery and Redis integration for sending SMS (Twilio), emails (SendGrid), and Push Notifications (Firebase) in the background.
-* **Security First:** Rate limiting, field-level encryption (`django-pgcrypto`), and brute-force protection (`django-axes`).
+* **Multi-Tenant Architecture:** Securely manage multiple clinics from a single backend instance. Data isolation is enforced via a custom `TenantMiddleware`.
+* **Role-Based Access Control (RBAC):** Granular permissions for Super Admins, Clinic Admins, Doctors, and Receptionists.
+* **Patient Management:** Full EHR support with visit history, medical records, and attachments.
+* **Smart Appointments:** Queue management, slot booking, and real-time status updates via WebSockets.
+* **Digital Prescriptions:** Generate professional PDF prescriptions with homeopathic remedy repertorisation.
+* **Billing & Invoicing:** Automated invoice generation, partial payments tracking, and subscription management.
+* **Audit Logging:** Immutable audit trails for all data-modifying requests, ensuring compliance and security.
+* **Dockerized Environment:** One-command setup for production and development.
 
 ## 🛠️ Technology Stack
 
 | Component | Technology |
 | :--- | :--- |
-| **Framework** | Django 4.2.13, Django REST Framework 3.15.1 |
-| **Database** | PostgreSQL (`psycopg2`) |
-| **Caching & Message Broker**| Redis, Celery, Django Celery Beat |
-| **Authentication** | JWT (`djangorestframework-simplejwt`) |
-| **Storage** | AWS S3 (`django-storages`, `boto3`) |
+| **Framework** | Django 4.2+, Django REST Framework 3.15+ |
+| **Database** | PostgreSQL, dj-database-url |
+| **Caching** | Redis, django-redis |
+| **Task Queue** | Celery, django-celery-beat |
+| **Authentication** | JWT (SimpleJWT) |
 | **WebSockets** | Django Channels, Daphne |
-| **Logging & Monitoring** | Structlog, Sentry SDK, Django Silk |
+| **PDF Engine** | WeasyPrint |
+| **Deployment** | Docker, Nginx, Gunicorn |
 
 ## 📁 Project Structure
-
-The project follows a modular, app-based architecture:
 
 ```text
 homeopathy_cms/
 ├── apps/
-│   ├── accounts/         # User models, RBAC, and auth logic
-│   ├── activity_logs/    # Audit trails and system logging
-│   ├── appointments/     # Scheduling and queue management
-│   ├── billing/          # Invoices and payment tracking
-│   ├── clinics/          # Multi-tenant clinic entities and settings
-│   ├── core/             # Shared mixins, abstract models, and base utils
-│   ├── notifications/    # SMS, Email, and Push notification handling
-│   ├── patients/         # Patient records and histories
-│   ├── prescriptions/    # E-prescriptions and PDF generation
-│   └── staff/            # Clinic staff profiles and permissions
-├── config/               # Main Django settings and root URL routing
-├── middleware/           # Custom request/response middleware
-├── tasks/                # Global or shared asynchronous Celery tasks
-├── tests/                # Pytest suites for the application
-├── utils/                # Helper functions, formatters, and custom permissions
-└── websockets/           # ASGI routing and WebSocket consumers
+│   ├── accounts/         # Auth, RBAC, User Profiles
+│   ├── activity_logs/    # Immutable Audit Trails
+│   ├── appointments/     # Scheduling & Queue Management
+│   ├── billing/          # Invoices, Payments, Subscriptions
+│   ├── clinics/          # Clinic Entities & Settings
+│   ├── notifications/    # SMS/Email/In-app Notifications
+│   ├── patients/         # Electronic Health Records (EHR)
+│   ├── prescriptions/    # E-Prescriptions & PDF Logic
+│   └── staff/            # Clinic Member Management
+├── config/               # Settings & Root URLs
+├── middleware/           # Tenant & Audit Middleware
+├── utils/                # Mixins, Permissions, Helpers
+└── docker-compose.yml    # Production Orchestration
 ```
 
-## 🚀 Getting Started
+## 🚀 Quick Start (Docker)
 
-### Prerequisites
+The fastest way to get the system running for testing:
 
-Ensure you have the following installed on your local machine:
-* **Python** 3.10+
-* **PostgreSQL** 14+
-* **Redis** (running on default port 6379)
-
-### Installation
-
-1. **Clone the repository:**
+1. **Clone & Enter:**
    ```bash
    git clone https://github.com/Mr-fuaaaadh/homeopathic_crm.git
    cd homeopathy_cms
    ```
 
-2. **Set up a virtual environment:**
+2. **Run with Docker Compose:**
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use: venv\Scripts\activate
+   docker-compose up --build
    ```
 
-3. **Install dependencies:**
+3. **Initialize Database:**
    ```bash
-   pip install -r requirements.txt
+   docker-compose exec web python manage.py migrate
+   docker-compose exec web python manage.py createsuperuser
    ```
 
-4. **Environment Variables:**
-   Create a `.env` file in the root directory. Use the `python-decouple` standard for configurations:
-   ```env
-   SECRET_KEY=your-secret-key
-   DEBUG=True
-   DATABASE_URL=postgres://user:password@localhost:5432/homeopathy_db
-   REDIS_URL=redis://127.0.0.1:6379/1
-   ```
+4. **Access API:**
+   - API Root: `http://localhost:8000/api/v1/`
+   - Admin: `http://localhost:8000/admin/`
 
-5. **Run Migrations:**
-   ```bash
-   python manage.py migrate
-   ```
+## 📡 API Endpoints Reference
 
-6. **Create a Superuser:**
-   ```bash
-   python manage.py createsuperuser
-   ```
+All endpoints (except Auth and Clinic creation) require a `clinic_id`. This can be provided via the `X-Clinic-ID` header or is automatically extracted from the JWT token claims.
 
-7. **Start the Development Server:**
-   ```bash
-   python manage.py runserver
-   ```
+### 🔑 Authentication (`/api/v1/auth/`)
+- `POST /login/`: Obtain access and refresh tokens. Returns user role and clinic context.
+- `GET /me/`: Get current user profile and assigned clinics.
+- `POST /register/`: Register a new account.
 
-8. **Start Celery Worker (in a separate terminal):**
-   ```bash
-   celery -A config worker -l info
-   ```
+### 🏥 Clinics (`/api/v1/clinics/`)
+- `GET /`: List clinics the user has access to.
+- `POST /`: Create a new clinic (SuperAdmin only).
 
-## 📡 API Endpoints Reference (Active)
+### 👥 Patients (`/api/v1/patients/`)
+- `GET /`: Search and filter patients.
+- `POST /`: Register a new patient.
+- `GET /{id}/history/`: View patient medical history timeline.
 
-The full list of endpoints and their configurations can be found in [config/urls.py](config/urls.py).
+### 📅 Appointments (`/api/v1/appointments/`)
+- `GET /queue/`: View today's live patient queue.
+- `POST /queue/next/`: (Receptionist/Doctor) Call the next patient in line.
+- `GET /slots/`: Check available time slots for a specific doctor/date.
 
-### Authentication (`/api/v1/auth/`)
-Source: [apps/accounts/urls.py](apps/accounts/urls.py)
+### 📜 Prescriptions (`/api/v1/prescriptions/`)
+- `POST /`: Create a new prescription.
+- `GET /{id}/pdf/`: Generate and download the PDF version of the prescription.
+- `GET /remedies/`: Access the global and clinic-specific homeopathic remedy database.
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/register/` | Register new user |
-| `POST` | `/login/` | Obtain JWT tokens |
-| `POST` | `/logout/` | Blacklist refresh token |
-| `POST` | `/token/refresh/` | Refresh access token |
-| `POST` | `/token/verify/` | Verify token validity (defined in root urls) |
-| `GET` | `/me/` | Current user profile |
-| `POST` | `/password/change/` | Change password |
-| `GET` | `/sessions/` | List active sessions |
+### 💳 Billing (`/api/v1/billing/`)
+- `GET /invoices/`: View clinic invoices.
+- `POST /invoices/{id}/pay/`: Record a full or partial payment.
 
-### Clinics (`/api/v1/clinics/`)
-Source: [apps/clinics/urls.py](apps/clinics/urls.py)
+### 👨‍⚕️ Staff (`/api/v1/staff/`)
+- `POST /invite/`: Invite a new doctor or receptionist to the clinic.
+- `PATCH /{id}/update-role/`: Change a staff member's role or deactivate them.
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/` | List clinics |
-| `POST` | `/` | Create clinic (SuperAdmin only) |
-| `GET` | `/{id}/` | Get clinic detail |
-| `PUT/PATCH` | `/{id}/` | Update clinic |
-| `DELETE` | `/{id}/` | Soft-delete clinic |
-| `GET` | `/{id}/stats/` | Clinic usage statistics |
-| `POST` | `/{id}/subscription/` | Update clinic subscription |
+### 🛡️ Activity Logs (`/api/v1/activity-logs/`)
+- `GET /`: View audit logs (Clinic Admin only). Tracks WHO did WHAT to WHICH resource and WHEN.
 
-### System & Admin
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/admin/` | Django Admin Dashboard |
-| `GET` | `/silk/` | Silk Profiling (Development only) |
+## 🧪 Testing for Testers
 
-> [!NOTE]
-> Modules for Patients, Appointments, Prescriptions, Staff, Billing, Notifications, and Activity Logs are currently initialized with empty routes and are under active development.
-
-## 🧪 Testing
-
-The project uses `pytest`. To run the test suite:
-
-```bash
-pytest
-```
-To generate a coverage report:
-```bash
-pytest --cov=apps --cov-report=html
-```
+1. **Authentication**: Use `/api/v1/auth/login/` to get a token. Include this token as `Authorization: Bearer <token>` in all subsequent requests.
+2. **Tenant Isolation**: Try to access a patient from `Clinic A` while logged into `Clinic B`. The system should return a `404` or `403`.
+3. **Audit Check**: Perform a sensitive action (e.g., delete a patient) and then check `/api/v1/activity-logs/` to verify the action was recorded.
+4. **PDF Check**: Create a prescription and hit the `/pdf/` endpoint to verify the generated layout.
 
 ## 📜 Coding Standards
+- **Formatting:** `black .`
+- **Quality:** `flake8`
+- **Tests:** `pytest`
 
-* **Formatting:** `black` is used for code formatting.
-* **Linting:** `flake8` is used to enforce PEP-8 standards.
-* Ensure all code is run through `black .` and `flake8` before committing.
+---
+*Proprietary Software. Developed for production-grade clinical management.*
 
 ## 📄 License
 
