@@ -71,6 +71,20 @@ The fastest way to get the system running for testing:
    - API Root: `http://localhost:8000/api/v1/`
    - Admin: `http://localhost:8000/admin/`
 
+## 🔐 Role-Based Access Control (RBAC)
+
+The system enforces strict access control based on user roles. A user can have a global role and different roles across multiple clinics.
+
+| Role | Access Level | Key Permissions |
+| :--- | :--- | :--- |
+| **Super Admin** | System-Wide | Manage clinics, global settings, and other super admins. |
+| **Clinic Admin** | Clinic-Wide | Manage staff, view audit logs, manage billing, and clinic settings. |
+| **Doctor** | Clinical | Create prescriptions, view patient history, manage own appointments. |
+| **Receptionist** | Operational | Register patients, book appointments, collect payments, manage queue. |
+| **Patient** | Personal | View own profile, appointments, and prescriptions (via Patient Portal). |
+
+---
+
 ## 📡 API Endpoints Reference
 
 All endpoints (except Auth and Clinic creation) require a `clinic_id`. This can be provided via the `X-Clinic-ID` header or is automatically extracted from the JWT token claims.
